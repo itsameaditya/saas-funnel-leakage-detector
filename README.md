@@ -144,21 +144,6 @@ Reducing mobile failure to web levels could generate:
 
 ---
 
-## Project Structure
-
-saas-funnel-leakage-detector/
-│
-├── data/
-├── notebooks/
-│   └── 01_funnel_analysis.ipynb
-├── reports/
-│   └── charts/
-├── src/
-│   └── generate_data.py
-├── .gitignore
-├── requirements.txt
-└── README.md
-
 ## How to Run
 ```
 pip install -r requirements.txt
