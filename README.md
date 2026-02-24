@@ -2,50 +2,140 @@
 
 ## Overview
 
-This project simulates a 20,000-user B2B SaaS customer funnel and identifies revenue leakage points across the acquisition → activation → subscription journey.
+This project simulates a 20,000-user B2B SaaS customer journey to identify revenue leakage across the acquisition → activation → trial → subscription funnel.
 
-The goal was to:
-- Identify funnel bottlenecks
-- Diagnose root causes
-- Quantify revenue impact (ARR)
+The objective was to:
+
+- Detect major funnel bottlenecks
+- Diagnose root causes of conversion drop-offs
+- Quantify financial impact in terms of ARR
+- Prioritize growth initiatives based on ROI
+
+This project combines product analytics, growth strategy, and revenue modeling.
 
 ---
 
 ## Dataset
 
-- 20,000 users
-- 229,000+ events
-- 3,654 subscriptions
-- Multi-session event simulation
-- Channel & device behavioral differences
+Synthetic event-based SaaS dataset generated using Python.
+
+- **20,000 users**
+- **229,000+ events**
+- **3,654 subscriptions**
+- Multi-session behavioral simulation
+- Channel-level and device-level behavior differences
+- Payment failures, churn modeling, and retention signals
 
 ---
 
-## Key Insights
+## Funnel Overview
 
-### Activation is the Primary Growth Lever
+### Funnel Conversion
+
+| Step | Users | Conversion from Previous |
+|------|-------|--------------------------|
+| Signup | 20,000 | — |
+| Onboarding Start | 16,827 | 84% |
+| Activation (Create Project) | 11,876 | 70.6% |
+| Trial Start | 10,020 | 84.3% |
+| Subscription | 3,654 | 36.4% |
+
+---
+
+## Key Findings
+
+### 1️⃣ Activation is the Primary Growth Lever
+
 - Activated users convert at **30.3%**
 - Non-activated users convert at **0.7%**
-- 43x conversion uplift
-- ~$377K ARR opportunity from improving Paid Social activation
+- **43x conversion uplift**
 
-### Mobile Checkout Friction
-- 13.7% failure rate on mobile vs 5.5% on web
-- 2.5x higher payment friction
-- ~$89K ARR opportunity from checkout optimization
+Improving activation by 5 percentage points results in:
+
+- +303 additional paid users
+- **~$296K ARR increase**
 
 ---
 
-## Business Impact
+### 2️⃣ Paid Social Underperforms on Activation
 
-Total identified ARR opportunity:
-**~$466K+ annually**
+Activation Rate by Channel:
+
+- Referral: 75%
+- Organic: 68.7%
+- Paid Search: 59.1%
+- Partner: 57.5%
+- Paid Social: 43.4%
+
+Closing the activation gap between Paid Social and Organic could generate:
+
+- +386 additional paid users
+- **~$377K ARR annually**
+
+---
+
+### 3️⃣ Mobile Checkout Friction
+
+Trial → Paid Conversion:
+
+- Web: 38.1%
+- Mobile: 32.4%
+
+Payment Failure Rate:
+
+- Web: 5.5%
+- Mobile: 13.7% (2.5x higher)
+
+Reducing mobile payment failures to web levels could generate:
+
+- +91 paid users
+- **~$89K ARR annually**
+
+---
+
+## Revenue Opportunity Summary
+
+| Initiative | Estimated ARR Impact |
+|------------|---------------------|
+| Improve Paid Social Activation | ~$377K |
+| Reduce Mobile Checkout Failures | ~$89K |
+| Activation Improvement (5pp overall) | ~$296K |
+
+**Total Identified Revenue Opportunity: ~$466K+ annually**
+
+---
+
+## Visualizations
+
+### Funnel Overview
+![Funnel](reports/charts/funnel.png)
+
+### Activation by Channel
+![Activation](reports/charts/activation_by_channel.png)
+
+### Payment Failure Rate by Device
+![Failure](reports/charts/payment_failure_by_device.png)
+
+---
+
+## Strategic Recommendations
+
+1. Prioritize improving activation for Paid Social users
+2. Optimize mobile checkout reliability and payment UX
+3. Focus marketing spend on high-activation channels (Referral & Organic)
+4. Improve onboarding experience to increase activation rate
 
 ---
 
 ## Tech Stack
+
 - Python
 - Pandas
 - NumPy
 - Matplotlib
+- Faker (data simulation)
 - Jupyter Notebook
+
+---
+
+## Project Structure
