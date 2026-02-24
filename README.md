@@ -4,14 +4,14 @@
 
 This project simulates a 20,000-user B2B SaaS customer journey to identify revenue leakage across the acquisition → activation → trial → subscription funnel.
 
-The objective was to:
+The goal was to:
 
-- Detect major funnel bottlenecks
+- Identify key funnel bottlenecks
 - Diagnose root causes of conversion drop-offs
-- Quantify financial impact in terms of ARR
-- Prioritize growth initiatives based on ROI
+- Quantify financial impact (ARR)
+- Prioritize growth initiatives using data
 
-This project combines product analytics, growth strategy, and revenue modeling.
+This project combines product analytics, growth analysis, and revenue modeling.
 
 ---
 
@@ -23,17 +23,15 @@ Synthetic event-based SaaS dataset generated using Python.
 - **229,000+ events**
 - **3,654 subscriptions**
 - Multi-session behavioral simulation
-- Channel-level and device-level behavior differences
-- Payment failures, churn modeling, and retention signals
+- Channel-level and device-level behavioral differences
+- Payment failures and churn modeling included
 
 ---
 
-## Funnel Overview
-
-### Funnel Conversion
+## Funnel Conversion
 
 | Step | Users | Conversion from Previous |
-|------|-------|--------------------------|
+|------|------:|-------------------------:|
 | Signup | 20,000 | — |
 | Onboarding Start | 16,827 | 84% |
 | Activation (Create Project) | 11,876 | 70.6% |
@@ -50,7 +48,7 @@ Synthetic event-based SaaS dataset generated using Python.
 - Non-activated users convert at **0.7%**
 - **43x conversion uplift**
 
-Improving activation by 5 percentage points results in:
+Improving activation by 5 percentage points would result in:
 
 - +303 additional paid users
 - **~$296K ARR increase**
@@ -61,11 +59,13 @@ Improving activation by 5 percentage points results in:
 
 Activation Rate by Channel:
 
-- Referral: 75%
-- Organic: 68.7%
-- Paid Search: 59.1%
-- Partner: 57.5%
-- Paid Social: 43.4%
+| Channel | Activation Rate |
+|---------|----------------:|
+| Referral | 75% |
+| Organic | 68.7% |
+| Paid Search | 59.1% |
+| Partner | 57.5% |
+| Paid Social | 43.4% |
 
 Closing the activation gap between Paid Social and Organic could generate:
 
@@ -78,15 +78,21 @@ Closing the activation gap between Paid Social and Organic could generate:
 
 Trial → Paid Conversion:
 
-- Web: 38.1%
-- Mobile: 32.4%
+| Device | Conversion |
+|--------|-----------:|
+| Web | 38.1% |
+| Mobile | 32.4% |
 
 Payment Failure Rate:
 
-- Web: 5.5%
-- Mobile: 13.7% (2.5x higher)
+| Device | Failure Rate |
+|--------|-------------:|
+| Web | 5.5% |
+| Mobile | 13.7% |
 
-Reducing mobile payment failures to web levels could generate:
+Mobile experiences a **2.5x higher payment failure rate**.
+
+Reducing mobile failure to web levels could generate:
 
 - +91 paid users
 - **~$89K ARR annually**
@@ -96,7 +102,7 @@ Reducing mobile payment failures to web levels could generate:
 ## Revenue Opportunity Summary
 
 | Initiative | Estimated ARR Impact |
-|------------|---------------------|
+|------------|--------------------:|
 | Improve Paid Social Activation | ~$377K |
 | Reduce Mobile Checkout Failures | ~$89K |
 | Activation Improvement (5pp overall) | ~$296K |
@@ -120,10 +126,10 @@ Reducing mobile payment failures to web levels could generate:
 
 ## Strategic Recommendations
 
-1. Prioritize improving activation for Paid Social users
+1. Prioritize activation improvements for Paid Social users
 2. Optimize mobile checkout reliability and payment UX
-3. Focus marketing spend on high-activation channels (Referral & Organic)
-4. Improve onboarding experience to increase activation rate
+3. Focus growth efforts on high-performing channels (Referral & Organic)
+4. Improve onboarding UX to increase activation rate
 
 ---
 
@@ -139,3 +145,35 @@ Reducing mobile payment failures to web levels could generate:
 ---
 
 ## Project Structure
+
+saas-funnel-leakage-detector/
+│
+├── data/
+├── notebooks/
+│   └── 01_funnel_analysis.ipynb
+├── reports/
+│   └── charts/
+├── src/
+│   └── generate_data.py
+├── .gitignore
+├── requirements.txt
+└── README.md
+
+## How to Run
+```
+pip install -r requirements.txt
+python src/generate_data.py
+```
+
+## Why This Project Matters
+
+This project demonstrates:
+
+- Funnel analytics  
+- Product & growth analysis  
+- Segmented conversion modeling  
+- Checkout friction diagnostics  
+- Revenue impact simulation  
+- Strategic prioritization using data  
+
+It bridges the gap between analytics and business decision-making.
