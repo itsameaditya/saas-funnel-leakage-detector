@@ -99,8 +99,7 @@ def weighted_choice(d: dict):
 
 def random_timestamp_within_last_n_days(n_days: int):
     now = datetime.now()
-    delta = timedelta(days=random.randint(0, n_days),
-                      minutes=random.randint(0, 1440))
+    delta = timedelta(days=random.randint(0, n_days), minutes=random.randint(0, 1440))
     return now - delta
 
 
@@ -135,7 +134,9 @@ def onboarding_start_probability(channel: str) -> float:
     return base
 
 
-def activation_probability(channel: str, device: str, persona: str, company_size: str) -> float:
+def activation_probability(
+    channel: str, device: str, persona: str, company_size: str
+) -> float:
     # Base by channel (quality)
     base = {
         "organic": 0.52,
@@ -191,7 +192,9 @@ def payment_failure_probability(device: str, country: str) -> float:
     return clamp01(base)
 
 
-def trial_to_paid_probability(activated: bool, channel: str, company_size: str) -> float:
+def trial_to_paid_probability(
+    activated: bool, channel: str, company_size: str
+) -> float:
     # This is the big driver for realistic paid conversion (keep it modest)
     base = 0.42 if activated else 0.06
 
@@ -223,18 +226,28 @@ def churn_probability(plan: str) -> float:
     return {"starter": 0.30, "pro": 0.18, "business": 0.10}[plan]
 
 
-def add_event(events_list, user_id: int, event_ts: datetime, event_name: str, session_id: str,
-              page: str = None, referrer: str = None, props: dict | None = None):
-    events_list.append({
-        "event_id": f"evt_{uuid.uuid4().hex}",
-        "user_id": user_id,
-        "event_ts": event_ts,
-        "session_id": session_id,
-        "event_name": event_name,
-        "page": page or "",
-        "referrer": referrer or "",
-        "event_properties": "{}" if not props else str(props).replace("'", '"'),
-    })
+def add_event(
+    events_list,
+    user_id: int,
+    event_ts: datetime,
+    event_name: str,
+    session_id: str,
+    page: str = None,
+    referrer: str = None,
+    props: dict | None = None,
+):
+    events_list.append(
+        {
+            "event_id": f"evt_{uuid.uuid4().hex}",
+            "user_id": user_id,
+            "event_ts": event_ts,
+            "session_id": session_id,
+            "event_name": event_name,
+            "page": page or "",
+            "referrer": referrer or "",
+            "event_properties": "{}" if not props else str(props).replace("'", '"'),
+        }
+    )
 
 
 # -----------------------
@@ -265,13 +278,23 @@ def generate_data():
         # --- Session loop ---
         for s in range(sessions):
             # each session starts later (minutes to a few days)
-            session_gap_hours = int(np.random.choice([0, 1, 3, 8, 24, 48], p=[0.20, 0.20, 0.20, 0.15, 0.18, 0.07]))
-            session_start = t0 + timedelta(hours=session_gap_hours) + timedelta(minutes=random.randint(0, 120))
+            session_gap_hours = int(
+                np.random.choice(
+                    [0, 1, 3, 8, 24, 48], p=[0.20, 0.20, 0.20, 0.15, 0.18, 0.07]
+                )
+            )
+            session_start = (
+                t0
+                + timedelta(hours=session_gap_hours)
+                + timedelta(minutes=random.randint(0, 120))
+            )
             session_id = f"sess_{uuid.uuid4().hex[:10]}"
 
             # referrer hint based on channel
             if user["acquisition_channel"] in ["paid_social"]:
-                referrer = np.random.choice(["linkedin", "instagram", "facebook"], p=[0.55, 0.25, 0.20])
+                referrer = np.random.choice(
+                    ["linkedin", "instagram", "facebook"], p=[0.55, 0.25, 0.20]
+                )
             elif user["acquisition_channel"] in ["paid_search", "organic"]:
                 referrer = "google"
             elif user["acquisition_channel"] == "partner":
@@ -282,7 +305,9 @@ def generate_data():
             t = session_start
 
             # Browsing noise (1–4 events)
-            browse_count = int(np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.20, 0.10]))
+            browse_count = int(
+                np.random.choice([1, 2, 3, 4], p=[0.35, 0.35, 0.20, 0.10])
+            )
             for _ in range(browse_count):
                 ev = random.choice(BROWSING_EVENTS)
                 page_map = {
@@ -292,40 +317,86 @@ def generate_data():
                     "docs_view": "/docs",
                     "faq_view": "/faq",
                 }
-                add_event(events, user_id, t, ev, session_id, page=page_map.get(ev, ""), referrer=referrer)
+                add_event(
+                    events,
+                    user_id,
+                    t,
+                    ev,
+                    session_id,
+                    page=page_map.get(ev, ""),
+                    referrer=referrer,
+                )
                 t += timedelta(minutes=random.randint(1, 20))
 
             # Signup happens once (first session)
             if s == 0:
-                add_event(events, user_id, t, "signup", session_id, page="/signup", referrer=referrer)
+                add_event(
+                    events,
+                    user_id,
+                    t,
+                    "signup",
+                    session_id,
+                    page="/signup",
+                    referrer=referrer,
+                )
                 t += timedelta(minutes=random.randint(1, 30))
 
                 # email verify not guaranteed
                 if random.random() < 0.78:
-                    add_event(events, user_id, t, "email_verified", session_id, page="/verify")
+                    add_event(
+                        events, user_id, t, "email_verified", session_id, page="/verify"
+                    )
                     t += timedelta(minutes=random.randint(1, 30))
 
                 # onboarding start (not guaranteed)
-                if random.random() < onboarding_start_probability(user["acquisition_channel"]):
-                    add_event(events, user_id, t, "onboarding_start", session_id, page="/onboarding")
+                if random.random() < onboarding_start_probability(
+                    user["acquisition_channel"]
+                ):
+                    add_event(
+                        events,
+                        user_id,
+                        t,
+                        "onboarding_start",
+                        session_id,
+                        page="/onboarding",
+                    )
                     t += timedelta(minutes=random.randint(2, 60))
 
                     # onboarding complete sometimes
                     if random.random() < 0.70:
-                        add_event(events, user_id, t, "onboarding_complete", session_id, page="/onboarding/done")
+                        add_event(
+                            events,
+                            user_id,
+                            t,
+                            "onboarding_complete",
+                            session_id,
+                            page="/onboarding/done",
+                        )
                         t += timedelta(minutes=random.randint(2, 30))
 
             # Try to activate if not already activated
             if not activated:
                 if random.random() < activation_probability(
-                    user["acquisition_channel"], user["device"], user["persona"], user["company_size"]
+                    user["acquisition_channel"],
+                    user["device"],
+                    user["persona"],
+                    user["company_size"],
                 ):
-                    add_event(events, user_id, t, "create_first_project", session_id, page="/app/new_project")
+                    add_event(
+                        events,
+                        user_id,
+                        t,
+                        "create_first_project",
+                        session_id,
+                        page="/app/new_project",
+                    )
                     t += timedelta(minutes=random.randint(2, 40))
                     activated = True
 
                     # Some immediate product events after activation
-                    for _ in range(int(np.random.choice([1, 2, 3, 4], p=[0.20, 0.35, 0.30, 0.15]))):
+                    for _ in range(
+                        int(np.random.choice([1, 2, 3, 4], p=[0.20, 0.35, 0.30, 0.15]))
+                    ):
                         pe = random.choice(PRODUCT_EVENTS)
                         add_event(events, user_id, t, pe, session_id, page="/app")
                         t += timedelta(minutes=random.randint(1, 25))
@@ -333,41 +404,92 @@ def generate_data():
                     # Value moment (invite or integration) sometimes follows
                     if random.random() < value_moment_probability(user["persona"]):
                         if random.random() < 0.55:
-                            add_event(events, user_id, t, "invite_teammate", session_id, page="/app/invite",
-                                      props={"invite_count": int(np.random.choice([1, 2, 3], p=[0.55, 0.30, 0.15]))})
+                            add_event(
+                                events,
+                                user_id,
+                                t,
+                                "invite_teammate",
+                                session_id,
+                                page="/app/invite",
+                                props={
+                                    "invite_count": int(
+                                        np.random.choice(
+                                            [1, 2, 3], p=[0.55, 0.30, 0.15]
+                                        )
+                                    )
+                                },
+                            )
                         else:
                             integ = random.choice(INTEGRATIONS)
-                            add_event(events, user_id, t, "connect_integration", session_id, page="/app/integrations",
-                                      props={"integration": integ})
+                            add_event(
+                                events,
+                                user_id,
+                                t,
+                                "connect_integration",
+                                session_id,
+                                page="/app/integrations",
+                                props={"integration": integ},
+                            )
                         t += timedelta(minutes=random.randint(2, 45))
                         value_moment = True
 
             # Trial start attempt (once)
-            if (not trial_started) and random.random() < trial_probability(activated, user["acquisition_channel"]):
-                add_event(events, user_id, t, "trial_start", session_id, page="/app/billing")
+            if (not trial_started) and random.random() < trial_probability(
+                activated, user["acquisition_channel"]
+            ):
+                add_event(
+                    events, user_id, t, "trial_start", session_id, page="/app/billing"
+                )
                 t += timedelta(minutes=random.randint(1, 30))
                 trial_started = True
 
                 # Checkout behavior: retries possible
-                checkout_attempts = int(np.random.choice([1, 2, 3], p=[0.70, 0.22, 0.08]))
+                checkout_attempts = int(
+                    np.random.choice([1, 2, 3], p=[0.70, 0.22, 0.08])
+                )
                 for attempt in range(checkout_attempts):
-                    add_event(events, user_id, t, "checkout_start", session_id, page="/checkout",
-                              props={"attempt": attempt + 1})
+                    add_event(
+                        events,
+                        user_id,
+                        t,
+                        "checkout_start",
+                        session_id,
+                        page="/checkout",
+                        props={"attempt": attempt + 1},
+                    )
                     t += timedelta(minutes=random.randint(1, 10))
 
-                    if random.random() < payment_failure_probability(user["device"], user["country"]):
-                        add_event(events, user_id, t, "payment_failed", session_id, page="/checkout",
-                                  props={"error_code": random.choice(PAYMENT_ERROR_CODES)})
+                    if random.random() < payment_failure_probability(
+                        user["device"], user["country"]
+                    ):
+                        add_event(
+                            events,
+                            user_id,
+                            t,
+                            "payment_failed",
+                            session_id,
+                            page="/checkout",
+                            props={"error_code": random.choice(PAYMENT_ERROR_CODES)},
+                        )
                         t += timedelta(minutes=random.randint(3, 25))
                         # many users stop after a failure; some continue retrying
                         if random.random() < 0.65:
                             break
                     else:
                         # payment success doesn't guarantee subscription; decision probability happens here
-                        if (not subscribed) and random.random() < trial_to_paid_probability(
+                        if (
+                            not subscribed
+                        ) and random.random() < trial_to_paid_probability(
                             activated, user["acquisition_channel"], user["company_size"]
                         ):
-                            add_event(events, user_id, t, "subscription_created", session_id, page="/checkout/success")
+                            add_event(
+                                events,
+                                user_id,
+                                t,
+                                "subscription_created",
+                                session_id,
+                                page="/checkout/success",
+                            )
                             subscribed = True
                             subscription_start_ts = t
                         t += timedelta(minutes=random.randint(1, 15))
@@ -377,7 +499,9 @@ def generate_data():
             # Create events on later sessions too
             if activated:
                 if random.random() < (0.40 if not subscribed else 0.55):
-                    add_event(events, user_id, t, "dashboard_view", session_id, page="/app")
+                    add_event(
+                        events, user_id, t, "dashboard_view", session_id, page="/app"
+                    )
                     t += timedelta(minutes=random.randint(1, 20))
 
         # --- After sessions, create subscription record + churn and retention markers ---
@@ -386,35 +510,71 @@ def generate_data():
 
             churn_ts = None
             if random.random() < churn_probability(plan):
-                churn_ts = subscription_start_ts + timedelta(days=random.randint(30, 75))
+                churn_ts = subscription_start_ts + timedelta(
+                    days=random.randint(30, 75)
+                )
                 # churn event
-                add_event(events, user_id, churn_ts, "cancel_subscription", f"sess_{uuid.uuid4().hex[:10]}",
-                          page="/app/billing", props={"reason": random.choice(["price", "low_value", "unknown", "competitor"])})
+                add_event(
+                    events,
+                    user_id,
+                    churn_ts,
+                    "cancel_subscription",
+                    f"sess_{uuid.uuid4().hex[:10]}",
+                    page="/app/billing",
+                    props={
+                        "reason": random.choice(
+                            ["price", "low_value", "unknown", "competitor"]
+                        )
+                    },
+                )
 
-            subscriptions.append({
-                "user_id": user_id,
-                "plan": plan,
-                "mrr": float(mrr),
-                "trial_start_ts": "",  # optional (you can compute from events later)
-                "subscription_start_ts": subscription_start_ts,
-                "churn_ts": churn_ts,
-            })
+            subscriptions.append(
+                {
+                    "user_id": user_id,
+                    "plan": plan,
+                    "mrr": float(mrr),
+                    "trial_start_ts": "",  # optional (you can compute from events later)
+                    "subscription_start_ts": subscription_start_ts,
+                    "churn_ts": churn_ts,
+                }
+            )
 
             # retention proxies: more likely if not churned early
             if churn_ts is None or (churn_ts - subscription_start_ts).days >= 7:
                 if random.random() < 0.60:
-                    add_event(events, user_id, subscription_start_ts + timedelta(days=7), "active_day_7",
-                              f"sess_{uuid.uuid4().hex[:10]}", page="/app")
+                    add_event(
+                        events,
+                        user_id,
+                        subscription_start_ts + timedelta(days=7),
+                        "active_day_7",
+                        f"sess_{uuid.uuid4().hex[:10]}",
+                        page="/app",
+                    )
             if churn_ts is None or (churn_ts - subscription_start_ts).days >= 30:
                 if random.random() < 0.45:
-                    add_event(events, user_id, subscription_start_ts + timedelta(days=30), "active_day_30",
-                              f"sess_{uuid.uuid4().hex[:10]}", page="/app")
+                    add_event(
+                        events,
+                        user_id,
+                        subscription_start_ts + timedelta(days=30),
+                        "active_day_30",
+                        f"sess_{uuid.uuid4().hex[:10]}",
+                        page="/app",
+                    )
 
         else:
             # even non-subscribers can have some retention events (activated users exploring)
             if activated and random.random() < 0.18:
-                t_ret = user["signup_ts"] + timedelta(days=7, minutes=random.randint(0, 600))
-                add_event(events, user_id, t_ret, "active_day_7", f"sess_{uuid.uuid4().hex[:10]}", page="/app")
+                t_ret = user["signup_ts"] + timedelta(
+                    days=7, minutes=random.randint(0, 600)
+                )
+                add_event(
+                    events,
+                    user_id,
+                    t_ret,
+                    "active_day_7",
+                    f"sess_{uuid.uuid4().hex[:10]}",
+                    page="/app",
+                )
 
     users_df = pd.DataFrame(users)
     events_df = pd.DataFrame(events)
@@ -425,7 +585,9 @@ def generate_data():
     events_df = events_df.sort_values(["user_id", "event_ts"]).reset_index(drop=True)
 
     users_df["signup_ts"] = pd.to_datetime(users_df["signup_ts"])
-    subs_df["subscription_start_ts"] = pd.to_datetime(subs_df["subscription_start_ts"], errors="coerce")
+    subs_df["subscription_start_ts"] = pd.to_datetime(
+        subs_df["subscription_start_ts"], errors="coerce"
+    )
     subs_df["churn_ts"] = pd.to_datetime(subs_df["churn_ts"], errors="coerce")
 
     os.makedirs("data", exist_ok=True)
